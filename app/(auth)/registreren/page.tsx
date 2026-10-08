@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { AuthShell } from "@/features/auth/components/AuthShell";
+import { RegisterForm } from "@/features/auth/components/RegisterForm";
 
 export const metadata: Metadata = {
   title: "Account aanmaken | HUBi",
@@ -25,6 +27,15 @@ export default function RegistrerenPage() {
           Maak een HUBi-account met je HU-mailadres
         </p>
       </header>
+
+      <RegisterForm />
+
+      <p className="mt-6 text-center text-[13px] text-hubi-muted">
+        Heb je al een account?{" "}
+        <Link href="/login" className="text-hubi-link">
+          Inloggen
+        </Link>
+      </p>
     </AuthShell>
   );
 }
