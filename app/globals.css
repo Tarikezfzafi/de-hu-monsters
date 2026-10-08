@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
+/* Kleuren en lettertype uit de Figma-wireframes */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f5f5f2;
+  --foreground: #14171c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-hubi-ink: #14171c;
+  --color-hubi-muted: #8a8f99;
+  --color-hubi-soft: #b2b8bf;
+  --color-hubi-line: #d6d9db;
+  --color-hubi-link: #2e6bde;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
