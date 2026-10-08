@@ -3,6 +3,7 @@
 
 import type { FormEvent } from "react";
 import { FormField } from "./FormField";
+import { PasswordField } from "./PasswordField";
 
 export function RegisterForm() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -26,19 +27,17 @@ export function RegisterForm() {
         autoComplete="email"
       />
 
-      <FormField
+      <PasswordField
         label="Wachtwoord"
         name="password"
-        type="password"
         placeholder="••••••••"
         autoComplete="new-password"
         hint="Minimaal 12 tekens"
       />
 
-      <FormField
+      <PasswordField
         label="Wachtwoord herhalen"
         name="confirmPassword"
-        type="password"
         placeholder="••••••••"
         autoComplete="new-password"
       />
