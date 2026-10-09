@@ -37,10 +37,11 @@ export function RegisterForm() {
 
       <FormField
         label="E-mailadres"
-        name="email"
         type="email"
         placeholder="jij@student.hu.nl"
         autoComplete="email"
+        error={errors.email?.message}
+        {...register("email")}
       />
 
       <PasswordField
