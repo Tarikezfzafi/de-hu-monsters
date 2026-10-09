@@ -9,6 +9,7 @@ type FormFieldProps = {
   autoComplete?: string; 
   hint?: string; 
   trailing?: ReactNode;
+  error?: string;   // error melding toegvoegd.
 };
 
 export function FormField({
@@ -19,6 +20,7 @@ export function FormField({
   autoComplete,
   hint,
   trailing,
+  error,
 }: FormFieldProps) {
   const hintId = `${name}-hint`;
 
@@ -40,6 +42,7 @@ export function FormField({
           placeholder={placeholder}
           autoComplete={autoComplete}
           aria-describedby={hint ? hintId : undefined}
+          aria-invalid={!!error}
           className={`mt-0.5 block w-full border-0 border-b-2 border-hubi-ink bg-transparent pb-1.5 text-sm text-hubi-ink outline-none placeholder:text-hubi-muted focus-visible:border-hubi-link lg:text-[15px] ${trailing ? "pr-8" : ""}`}
         />
         {trailing && (
@@ -52,6 +55,12 @@ export function FormField({
       {hint && (
         <p id={hintId} className="mt-1.5 text-[11px] text-hubi-muted">
           {hint}
+        </p>
+      )}
+
+      {error && (                   // ← nieuw: onder de hint,
+        <p className="mt-1.5 text-[11px] text-red-600">
+          {error}
         </p>
       )}
     </div>
