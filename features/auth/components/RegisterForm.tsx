@@ -1,17 +1,33 @@
 "use client";
 
 
-import type { FormEvent } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { FormField } from "./FormField";
 import { PasswordField } from "./PasswordField";
+import {
+  MIN_PASSWORD_LENGTH,
+  registerSchema,
+  type RegisterValues,
+} from "../schemas";
 
 export function RegisterForm() {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    trigger,
+    formState: { errors, touchedFields },
+  } = useForm<RegisterValues>({
+    resolver: zodResolver(registerSchema),
+    mode: "onTouched",
+  });
+
+  function onSubmit(values: RegisterValues) {
+    void values;
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-[26px] flex flex-col gap-[18px]">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-[26px] flex flex-col gap-[18px]">
       <FormField
         label="Volledige naam"
         name="fullName"
@@ -21,25 +37,32 @@ export function RegisterForm() {
 
       <FormField
         label="E-mailadres"
-        name="email"
         type="email"
         placeholder="jij@student.hu.nl"
         autoComplete="email"
+        error={errors.email?.message}
+        {...register("email")}
       />
 
       <PasswordField
         label="Wachtwoord"
-        name="password"
         placeholder="••••••••"
         autoComplete="new-password"
-        hint="Minimaal 12 tekens"
+        hint={`Minimaal ${MIN_PASSWORD_LENGTH} tekens`}
+        error={errors.password?.message}
+        {...register("password", {
+          onChange: () => {
+            if (touchedFields.confirmPassword) void trigger("confirmPassword");
+          },
+        })}
       />
 
       <PasswordField
         label="Wachtwoord herhalen"
-        name="confirmPassword"
         placeholder="••••••••"
         autoComplete="new-password"
+        error={errors.confirmPassword?.message}
+        {...register("confirmPassword")}
       />
 
       {}
