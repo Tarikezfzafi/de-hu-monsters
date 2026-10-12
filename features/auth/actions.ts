@@ -52,3 +52,37 @@ export async function registerUser(
   // 3. Doorsturen
   redirect("/registreren/bevestig");
 }
+
+const loginSchema = z.object({
+  email: z.email("Vul een geldig e-mailadres in"),
+  password: z.string().min(1, "Vul je wachtwoord in"),
+});
+
+export type LoginState = {
+  errors?: Partial<Record<keyof z.infer<typeof loginSchema>, string[]>>;
+  message?: string;
+};
+
+export async function loginUser(
+  _prevState: LoginState,
+  formData: FormData
+): Promise<LoginState> {
+  // 1. Valideren
+  const result = loginSchema.safeParse(Object.fromEntries(formData));
+
+  if (!result.success) {
+    return { errors: z.flattenError(result.error).fieldErrors };
+  }
+
+  // 2. Inloggen bij Supabase
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword(result.data);
+
+  if (error) {
+    return { message: "E-mailadres of wachtwoord klopt niet." };
+  }
+
+  // 3. Doorsturen
+  redirect("/");
+}
+
