@@ -44,7 +44,7 @@ export default function LoginScreen() {
               <label className="block text-xs text-gray-500 uppercase mb-1">E-mailadres</label>
               <input
                 type="email"
-                placeholder="jij@student.hu.nl"
+                placeholder="jij@Domian.nl"
                 className="w-full bg-transparent border-b border-black py-2 focus:outline-none focus:border-[#008DD5]"
               />
             </div>
