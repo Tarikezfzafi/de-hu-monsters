@@ -6,6 +6,7 @@ const HU_EMAIL_DOMAINS = ["@student.hu.nl", "@hu.nl"];
 
 export const registerSchema = z
   .object({
+    fullName: z.string().trim().min(2, "Vul je voor- en achternaam in"),
     email: z
       .string()
       .trim()
@@ -20,6 +21,12 @@ export const registerSchema = z
       .string()
       .min(MIN_PASSWORD_LENGTH, `Minimaal ${MIN_PASSWORD_LENGTH} tekens`),
     confirmPassword: z.string(),
+    acceptTerms: z
+      .boolean()
+      .refine(
+        (accepted) => accepted,
+        "Je moet akkoord gaan met de gebruiksvoorwaarden en het privacybeleid",
+      ),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
