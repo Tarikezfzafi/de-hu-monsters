@@ -55,7 +55,7 @@ export function RegisterForm() {
       <FormField
         label="E-mailadres"
         type="email"
-        placeholder="jij@student.hu.nl"
+        placeholder="naam@voorbeeld.com"
         autoComplete="email"
         error={errors.email?.message}
         {...register("email")}
