@@ -24,7 +24,7 @@ export function RegisterForm() {
         label="E-mailadres"
         name="email"
         type="email"
-        placeholder="jij@student.hu.nl"
+        placeholder="naam@voorbeeld.nl"
         autoComplete="email"
         error={state.errors?.email?.[0]}
       />
