@@ -1,0 +1,99 @@
+import React from 'react';
+
+export default function LoginScreen() {
+  return (
+    <div className="min-h-screen flex w-full font-sans bg-gray-100">
+      
+      {/* Linker paneel: Alleen zichtbaar op desktop (image_0df69e.png) */}
+      <div className="hidden lg:flex w-1/2 bg-[#1B1F24] text-white p-16 flex-col justify-between">
+        <div className="text-3xl font-bold tracking-wider">HUBi</div>
+        <div>
+          <h1 className="text-5xl font-bold mb-4 leading-tight">
+            Vind je tribe.<br />
+            Deel je skills.<br />
+            Groei samen.
+          </h1>
+          <p className="text-gray-400 max-w-md text-lg">
+            HUBi matcht je met medestudenten op skills en hobby's, met wekelijkse challenges om samen te groeien.
+          </p>
+        </div>
+        <div>{/* Lege div om de tekst in het midden te balanceren */}</div>
+      </div>
+
+      {/* Rechter paneel: Inlogformulier (image_0df39f.png & image_0df69e.png) */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#F1F2F3] p-6 lg:p-8">
+        <div className="w-full max-w-md bg-transparent lg:bg-transparent p-4 lg:p-10">
+          
+          <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Scherm 01</p>
+          <h2 className="text-4xl font-bold mb-2 text-[#1B1F24]">Inloggen</h2>
+          <p className="text-gray-500 mb-8">Log in of maak een account aan om te starten</p>
+
+          {/* Tab-switches (Inloggen / Registreren) */}
+          <div className="flex w-full mb-8 border border-black rounded-lg overflow-hidden">
+            <button className="w-1/2 bg-[#008DD5] text-white py-3 font-semibold">
+              Inloggen
+            </button>
+            <button className="w-1/2 bg-transparent text-black py-3 font-semibold">
+              Registreren
+            </button>
+          </div>
+
+          {/* Formulier */}
+          <form className="space-y-6">
+            <div>
+              <label className="block text-xs text-gray-500 uppercase mb-1">E-mailadres</label>
+              <input
+                type="email"
+                placeholder="jij@student.hu.nl"
+                className="w-full bg-transparent border-b border-black py-2 focus:outline-none focus:border-[#008DD5]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-500 uppercase mb-1">Wachtwoord</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="w-full bg-transparent border-b border-black py-2 focus:outline-none focus:border-[#008DD5]"
+              />
+            </div>
+
+            <div className="text-right">
+              <a href="#" className="text-sm text-[#008DD5] hover:underline">
+                Wachtwoord vergeten?
+              </a>
+            </div>
+
+            <button
+              type="button"
+              className="w-full bg-[#008DD5] text-white py-3 rounded-lg font-bold flex justify-center items-center gap-2"
+            >
+              Inloggen &rarr;
+            </button>
+          </form>
+
+          {/* Scheidingslijn */}
+          <div className="flex items-center my-6">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="mx-4 text-gray-500 text-sm">of</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+
+          {/* HU Account Login */}
+          <button
+            type="button"
+            className="w-full border border-black bg-transparent text-black py-3 rounded-lg font-bold mb-6 hover:bg-gray-100"
+          >
+            Inloggen met HU-account
+          </button>
+
+          {/* Registreer link */}
+          <p className="text-center text-sm text-gray-500">
+            Nog geen account? <a href="#" className="text-[#008DD5] hover:underline">Registreer hier</a>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  );
+}
