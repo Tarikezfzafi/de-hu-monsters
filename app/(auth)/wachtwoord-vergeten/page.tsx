@@ -19,8 +19,8 @@ export default function WachtwoordVergetenPage() {
       brandText="Je ontvangt een link per e-mail om een nieuw wachtwoord in te stellen."
     >
       <header>
-        <h1>Wachtwoord vergeten</h1>
-        <p>
+        <h1 className="text-[26px] font-bold lg:text-[28px]">Wachtwoord vergeten</h1>
+        <p className="mt-1 text-[13px] text-hubi-muted lg:mt-2 lg:text-sm">
           Vul je e-mailadres in. We sturen je een link om een nieuw wachtwoord in te stellen.</p>
       </header>
     </AuthShell>
