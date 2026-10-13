@@ -51,6 +51,7 @@ export async function registerUser(
     password: result.data.password,
     options: {
       data: { full_name: result.data.fullName },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`,
     },
   });
 
