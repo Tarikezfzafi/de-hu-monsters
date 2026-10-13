@@ -39,7 +39,7 @@ export async function registerUser(
 
   if (!result.success) {
     return { 
-      errors: result.error.flatten().fieldErrors,
+      errors: z.flattenError(result.error).fieldErrors,
       values: { fullName, email }
     };
   }
@@ -56,6 +56,7 @@ export async function registerUser(
   });
 
   if (error) {
+    console.error(error);
     return { 
       message: "Registreren is mislukt. Probeer het opnieuw.",
       values: { fullName, email }
@@ -92,7 +93,7 @@ export async function loginUser(
 
   if (!result.success) {
     return { 
-      errors: result.error.flatten().fieldErrors,
+      errors: z.flattenError(result.error).fieldErrors,
       values: { email }
     };
   }
