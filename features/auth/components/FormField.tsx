@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-
 type FormFieldProps = {
   label: string;
   name: string; 
@@ -9,7 +8,9 @@ type FormFieldProps = {
   autoComplete?: string; 
   hint?: string; 
   trailing?: ReactNode;
-  error?: string;   // error melding toegvoegd.
+  error?: string;
+  // ↓ 1. Toegevoegd aan de types
+  defaultValue?: string; 
 };
 
 export function FormField({
@@ -21,12 +22,13 @@ export function FormField({
   hint,
   trailing,
   error,
+  // ↓ 2. Opgehaald uit de props
+  defaultValue,
 }: FormFieldProps) {
   const hintId = `${name}-hint`;
 
   return (
     <div>
-      {}
       <label
         htmlFor={name}
         className="block text-[10px] font-medium uppercase tracking-[0.6px] text-hubi-muted"
@@ -41,6 +43,8 @@ export function FormField({
           type={type}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          // ↓ 3. Doorgegeven aan de input
+          defaultValue={defaultValue} 
           aria-describedby={hint ? hintId : undefined}
           aria-invalid={!!error}
           className={`mt-0.5 block w-full border-0 border-b-2 border-hubi-ink bg-transparent pb-1.5 text-sm text-hubi-ink outline-none placeholder:text-hubi-muted focus-visible:border-hubi-link lg:text-[15px] ${trailing ? "pr-8" : ""}`}
@@ -58,7 +62,7 @@ export function FormField({
         </p>
       )}
 
-      {error && (                   // ← nieuw: onder de hint,
+      {error && (
         <p className="mt-1.5 text-[11px] text-red-600">
           {error}
         </p>

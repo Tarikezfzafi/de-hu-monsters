@@ -14,21 +14,25 @@ export function RegisterForm() {
   return (
     <>
       <form action={formAction} className="mt-[26px] flex flex-col gap-[18px]">
+        {/* AANGEPAST: defaultValue toegevoegd */}
         <FormField
           label="Volledige naam"
           name="fullName"
           placeholder="Voor- en achternaam"
           autoComplete="name"
           error={state.errors?.fullName?.[0]}
+          defaultValue={state.values?.fullName}
         />
 
+        {/* AANGEPAST: defaultValue toegevoegd */}
         <FormField
           label="E-mailadres"
           name="email"
           type="email"
-          placeholder="jij@domain.hu.nl"
+          placeholder="jij@domain.nl"
           autoComplete="email"
           error={state.errors?.email?.[0]}
+          defaultValue={state.values?.email}
         />
 
         <PasswordField
