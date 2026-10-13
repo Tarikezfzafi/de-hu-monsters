@@ -1,11 +1,24 @@
 import type { Metadata } from "next";
+import { AuthShell } from "@/features/auth/components/AuthShell";
 
 export const metadata: Metadata = {
   title: "Wachtwoord vergeten | HUBi",
 };
 
-// TODO: frontend nog bouwen (zie ontwerp "Wachtwoord vergeten").
-// Gebruik AuthShell + FormField, net als login/page.tsx en registreren/page.tsx.
+// Taak 2: tekst (zie ontwerp D1b). De rest volgt.
 export default function WachtwoordVergetenPage() {
-  return null;
+  return (
+    <AuthShell
+      brandTitle={
+        <>
+          Geen zorgen,
+          <br />
+          je komt er weer in.
+        </>
+      }
+      brandText="Je ontvangt een link per e-mail om een nieuw wachtwoord in te stellen."
+    >
+      {null}
+    </AuthShell>
+  );
 }
