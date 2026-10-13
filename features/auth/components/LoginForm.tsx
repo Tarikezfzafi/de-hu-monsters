@@ -17,7 +17,7 @@ export function LoginForm() {
         label="E-mailadres"
         name="email"
         type="email"
-        placeholder="jij@domain.hu.nl"
+        placeholder="jij@domain.nl"
         autoComplete="email"
         error={state.errors?.email?.[0]}
       />
