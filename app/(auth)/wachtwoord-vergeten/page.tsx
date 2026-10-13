@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { ForgotPasswordForm } from "@/features/auth/components/ForgotPasswordForm";
 
@@ -19,6 +20,13 @@ export default function WachtwoordVergetenPage() {
       }
       brandText="Je ontvangt een link per e-mail om een nieuw wachtwoord in te stellen."
     >
+      <Link
+        href="/login"
+        className="mb-5 inline-block text-[13px] font-medium text-hubi-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hubi-link lg:mb-6"
+      >
+        ← Terug naar inloggen
+      </Link>
+
       <header>
         <h1 className="text-[26px] font-bold lg:text-[28px]">Wachtwoord vergeten</h1>
         <p className="mt-1 text-[13px] text-hubi-muted lg:mt-2 lg:text-sm">
