@@ -5,10 +5,10 @@ export const metadata: Metadata = {
   title: "Wachtwoord vergeten | HUBi",
 };
 
-// Taak 2: tekst (zie ontwerp D1b). De rest volgt.
+// Taak 3: header en instructie. De opmaak volgt in taak 4.
 export default function WachtwoordVergetenPage() {
   return (
-    <AuthShell
+    <AuthShell 
       brandTitle={
         <>
           Geen zorgen,
@@ -18,7 +18,11 @@ export default function WachtwoordVergetenPage() {
       }
       brandText="Je ontvangt een link per e-mail om een nieuw wachtwoord in te stellen."
     >
-      {null}
+      <header>
+        <h1>Wachtwoord vergeten</h1>
+        <p>
+          Vul je e-mailadres in. We sturen je een link om een nieuw wachtwoord in te stellen.</p>
+      </header>
     </AuthShell>
   );
 }
