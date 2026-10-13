@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AuthShell } from "@/features/auth/components/AuthShell";
+import { ForgotPasswordForm } from "@/features/auth/components/ForgotPasswordForm";
 
 export const metadata: Metadata = {
   title: "Wachtwoord vergeten | HUBi",
@@ -23,6 +24,8 @@ export default function WachtwoordVergetenPage() {
         <p className="mt-1 text-[13px] text-hubi-muted lg:mt-2 lg:text-sm">
           Vul je e-mailadres in. We sturen je een link om een nieuw wachtwoord in te stellen.</p>
       </header>
+
+      <ForgotPasswordForm />
     </AuthShell>
   );
 }
