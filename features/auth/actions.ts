@@ -110,7 +110,7 @@ export async function loginUser(
   }
 
   // 3. Doorsturen
-  redirect("/");
+  redirect("/profiel");
 }
 
 const forgotPasswordSchema = z.object({
