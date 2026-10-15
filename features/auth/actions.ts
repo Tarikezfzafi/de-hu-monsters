@@ -110,5 +110,95 @@ export async function loginUser(
   }
 
   // 3. Doorsturen
-  redirect("/");
+  redirect("/profiel");
+}
+
+const forgotPasswordSchema = z.object({
+  email: z.email("Vul een geldig e-mailadres in"),
+});
+
+export type ForgotPasswordState = {
+  errors?: Partial<Record<keyof z.infer<typeof forgotPasswordSchema>, string[]>>;
+  message?: string;
+  sent?: boolean;
+  values?: { email?: string };
+};
+
+export async function requestPasswordReset(
+  _prevState: ForgotPasswordState,
+  formData: FormData
+): Promise<ForgotPasswordState> {
+  const email = formData.get("email")?.toString() || "";
+
+  // 1. Valideren
+  const result = forgotPasswordSchema.safeParse(Object.fromEntries(formData));
+
+  if (!result.success) {
+    return {
+      errors: z.flattenError(result.error).fieldErrors,
+      values: { email },
+    };
+  }
+
+  // 2. Resetmail laten versturen door Supabase
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(result.data.email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/wachtwoord-resetten`,
+  });
+
+  if (error) {
+    console.error(error);
+  }
+
+  // 3. Altijd "verstuurd" tonen, ook als het e-mailadres niet bestaat
+  return { sent: true, values: { email } };
+}
+
+const resetPasswordSchema = z
+  .object({
+    password: z.string().min(12, "Wachtwoord moet minimaal 12 tekens zijn"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Wachtwoorden komen niet overeen",
+    path: ["confirmPassword"],
+  });
+
+export type ResetPasswordState = {
+  errors?: Partial<Record<keyof z.infer<typeof resetPasswordSchema>, string[]>>;
+  message?: string;
+};
+
+export async function updatePassword(
+  _prevState: ResetPasswordState,
+  formData: FormData
+): Promise<ResetPasswordState> {
+  // 1. Valideren
+  const result = resetPasswordSchema.safeParse(Object.fromEntries(formData));
+
+  if (!result.success) {
+    return { errors: z.flattenError(result.error).fieldErrors };
+  }
+
+  // 2. Nieuw wachtwoord opslaan bij Supabase
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({
+    password: result.data.password,
+  });
+
+    if (error) {
+    // Zelfde wachtwoord als het oude: link is nog geldig, dus ander bericht
+    if (error.code === "same_password") {
+      return { message: "Kies een ander wachtwoord dan je huidige." };
+    }
+
+    console.error(error);
+    return { message: "Wachtwoord wijzigen is mislukt. Vraag een nieuwe link aan." };
+  }
+
+    // 3. Uitloggen, zodat de gebruiker opnieuw inlogt met het nieuwe wachtwoord
+  await supabase.auth.signOut();
+
+  // 4. Doorsturen naar inloggen
+  redirect("/login?wachtwoord=gewijzigd");
 }

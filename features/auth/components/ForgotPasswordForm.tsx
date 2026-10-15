@@ -1,27 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { useActionState } from "react";
+import { requestPasswordReset, type ForgotPasswordState } from "../actions";
 import { FormField } from "./FormField";
 
+const initialState: ForgotPasswordState = {};
+
 export function ForgotPasswordForm() {
-  const [sent, setSent] = useState(false);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    // Voorkomt dat de pagina herlaadt.
-    event.preventDefault();
-
-    // Alleen de weergave: er wordt nog niets verstuurd. Het echt versturen
-    // van de link (Supabase) en de controle van het e-mailadres volgen in een
-    // latere taak.
-    const email = String(new FormData(event.currentTarget).get("email") ?? "");
-    if (email.trim() === "") return;
-    setSent(true);
-  }
+  const [state, formAction, pending] = useActionState(
+    requestPasswordReset,
+    initialState
+  );
 
   return (
     <form
-      onSubmit={handleSubmit}
+      action={formAction}
       noValidate
       className="mt-[26px] flex flex-col gap-[18px]"
     >
@@ -31,16 +24,19 @@ export function ForgotPasswordForm() {
         type="email"
         placeholder="jij@domain.hu.nl"
         autoComplete="email"
+        error={state.errors?.email?.[0]}
+        defaultValue={state.values?.email}
       />
 
       <button
         type="submit"
-        className="mt-[14px] h-[46px] w-full rounded-[10px] bg-hubi-ink text-[15px] font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hubi-link lg:mt-[18px] lg:h-[50px] lg:text-base"
+        disabled={pending}
+        className="mt-[14px] h-[46px] w-full rounded-[10px] bg-hubi-ink text-[15px] font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hubi-link disabled:cursor-not-allowed disabled:opacity-60 lg:mt-[18px] lg:h-[50px] lg:text-base"
       >
-        Link versturen →
+        {pending ? "Bezig..." : "Link versturen →"}
       </button>
 
-      {sent && (
+      {state.sent && (
         <div
           role="status"
           className="mt-2 rounded-[10px] border border-hubi-line bg-white px-4 py-[9px] lg:py-[13.5px]"
