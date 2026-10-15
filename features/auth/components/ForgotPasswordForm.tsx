@@ -43,12 +43,12 @@ export function ForgotPasswordForm() {
       {sent && (
         <div
           role="status"
-          className="mt-2 rounded-[10px] border border-hubi-line bg-white px-4 py-3"
+          className="mt-2 rounded-[10px] border border-hubi-line bg-white px-4 py-[9px] lg:py-[13.5px]"
         >
-          <p className="text-[13px] font-semibold text-hubi-ink lg:text-sm">
+          <p className="text-[13px] leading-4 font-semibold text-hubi-ink lg:text-sm lg:leading-[17px]">
             ✓ Check je inbox
           </p>
-          <p className="mt-1 text-xs text-hubi-muted">
+          <p className="mt-1 text-xs leading-[15px] text-hubi-muted">
             Staat de mail er niet tussen? Kijk in je spam of vraag een nieuwe
             link aan.
           </p>
