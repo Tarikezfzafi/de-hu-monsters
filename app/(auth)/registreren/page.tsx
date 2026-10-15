@@ -24,7 +24,7 @@ export default function RegistrerenPage() {
           Account aanmaken
         </h1>
         <p className="mt-1 text-[13px] text-hubi-muted lg:mt-2 lg:text-sm">
-          Maak een HUBi-account met je HU-mailadres
+          Maak een HUBi-account met je domain-mailadres
         </p>
       </header>
 
