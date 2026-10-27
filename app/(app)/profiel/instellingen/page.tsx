@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { AccountGegevens } from "@/features/instellingen/components/AccountGegevens";
+import { InstellingenKnoppen } from "@/features/instellingen/components/InstellingenKnoppen";
 
 export const metadata: Metadata = {
   title: "Instellingen | HUBi",
@@ -30,6 +31,8 @@ export default function InstellingenPage() {
         <Suspense fallback={<p className="text-sm text-hubi-muted">Laden...</p>}>
           <Account />
         </Suspense>
+
+        <InstellingenKnoppen />
       </div>
     </main>
   );
