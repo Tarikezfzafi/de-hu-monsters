@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -23,12 +24,19 @@ export function Navbar() {
     >
       <Link
         href="/ontdek"
-        className="hidden rounded-[10px] px-4 text-xl leading-6 font-bold text-hubi-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hubi-link lg:block"
+        className="hidden rounded-[10px] px-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hubi-link lg:block"
       >
-        HUBi
+        <Image
+          src="/logo.webp"
+          alt="HUBi"
+          width={900}
+          height={604}
+          sizes="72px"
+          className="h-auto w-[72px]"
+        />
       </Link>
 
-      <ul className="grid h-[72px] grid-cols-5 lg:mt-10 lg:flex lg:h-auto lg:flex-col lg:gap-3">
+      <ul className="grid h-[72px] grid-cols-5 lg:mt-4 lg:flex lg:h-auto lg:flex-col lg:gap-3">
         {LINKS.map(({ href, label }) => {
           const actief = pathname === href || pathname.startsWith(`${href}/`);
 
