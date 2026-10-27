@@ -20,6 +20,8 @@ export function LoginForm() {
         placeholder="jij@domain.nl"
         autoComplete="email"
         error={state.errors?.email?.[0]}
+        // ↓ Toegevoegd: bewaart de invoer na een fout
+        defaultValue={state.values?.email}
       />
 
       <PasswordField
