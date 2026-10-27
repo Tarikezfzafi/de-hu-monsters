@@ -19,9 +19,10 @@ type Profiel = {
 type ProfielFormProps = {
   naam: string;
   profiel: Profiel;
+  voorbeeld?: boolean;
 };
 
-export function ProfielForm({ naam, profiel }: ProfielFormProps) {
+export function ProfielForm({ naam, profiel, voorbeeld = false }: ProfielFormProps) {
   const [state, formAction, pending] = useActionState(saveProfile, initialState);
 
   return (
@@ -36,7 +37,11 @@ export function ProfielForm({ naam, profiel }: ProfielFormProps) {
         </p>
       </header>
 
-      <form action={formAction} className="mt-[26px] flex flex-col gap-[26px]">
+      <form
+        action={voorbeeld ? undefined : formAction}
+        onSubmit={voorbeeld ? (event) => event.preventDefault() : undefined}
+        className="mt-[26px] flex flex-col gap-[26px]"
+      >
         <div className="flex items-center gap-6 lg:gap-10">
           <AvatarUpload huidig={profiel?.avatar_url ?? null} error={state.errors?.foto?.[0]} />
 
