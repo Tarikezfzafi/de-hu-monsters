@@ -115,9 +115,6 @@ export function OntdekContent() {
     <div className="flex min-h-screen flex-1 flex-col bg-[#f3f4f6]">
       <main className="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
         <div className="mx-auto max-w-[1050px]">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-hubi-muted">
-            Scherm 03
-          </p>
           <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
             <div>
               <h1 className="text-[28px] font-bold tracking-tight text-hubi-ink">
