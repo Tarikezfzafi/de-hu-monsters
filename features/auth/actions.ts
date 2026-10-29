@@ -233,3 +233,17 @@ export async function updatePassword(
   // 4. Doorsturen naar inloggen
   redirect("/login?wachtwoord=gewijzigd");
 }
+
+export async function logoutUser() {
+  // 1. Sessie beëindigen bij Supabase en de sessie-cookies wissen
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error(error);
+  }
+
+  // 2. Doorsturen naar inloggen
+  redirect("/login");
+}
+
