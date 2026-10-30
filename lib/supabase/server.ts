@@ -18,7 +18,8 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-
+            // Server Components mogen geen cookies schrijven. Geen probleem:
+            // proxy.ts ververst de sessie al bij elk verzoek.
           }
         },
       },

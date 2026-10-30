@@ -3,6 +3,12 @@
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import {
+  blokkadeMelding,
+  blokkadeTot,
+  registreerMislukteLogin,
+  wisPogingen,
+} from "./pogingen";
 
 const registerSchema = z
   .object({
@@ -76,6 +82,8 @@ const loginSchema = z.object({
 export type LoginState = {
   errors?: Partial<Record<keyof z.infer<typeof loginSchema>, string[]>>;
   message?: string;
+  // Tijdstip (ms) waarop de blokkade na te veel pogingen eindigt
+  blokkadeTot?: number;
   values?: {
     email?: string;
   };
@@ -98,18 +106,41 @@ export async function loginUser(
     };
   }
 
-  // 2. Inloggen bij Supabase
+  // 2. Geblokkeerd na te veel mislukte pogingen?
+  const geblokkeerdTot = await blokkadeTot();
+
+  if (geblokkeerdTot) {
+    return {
+      message: blokkadeMelding(geblokkeerdTot),
+      blokkadeTot: geblokkeerdTot,
+      values: { email }
+    };
+  }
+
+  // 3. Inloggen bij Supabase
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(result.data);
 
   if (error) {
+    // Deze poging telt mee; bij de laatste poging gaat de blokkade in
+    const nieuweBlokkade = await registreerMislukteLogin();
+
+    if (nieuweBlokkade) {
+      return {
+        message: blokkadeMelding(nieuweBlokkade),
+        blokkadeTot: nieuweBlokkade,
+        values: { email }
+      };
+    }
+
     return { 
       message: "E-mailadres of wachtwoord klopt niet.",
       values: { email }
     };
   }
 
-  // 3. Doorsturen
+  // 4. Gelukt: teller wissen en doorsturen
+  await wisPogingen();
   redirect("/profiel");
 }
 
@@ -202,3 +233,17 @@ export async function updatePassword(
   // 4. Doorsturen naar inloggen
   redirect("/login?wachtwoord=gewijzigd");
 }
+
+export async function logoutUser() {
+  // 1. Sessie beëindigen bij Supabase en de sessie-cookies wissen
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error(error);
+  }
+
+  // 2. Doorsturen naar inloggen
+  redirect("/login");
+}
+
