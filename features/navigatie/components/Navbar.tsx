@@ -6,18 +6,30 @@ import { usePathname } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { logoutUser } from "@/features/auth/actions";
 
-// Dezelfde vijf schermen als in de Figma-wireframes (mobiel en desktop)
-const LINKS = [
+type NavLink = { href: string; label: string; alleenDesktop?: boolean };
+
+// De vijf schermen uit de Figma-wireframes (mobiel en desktop) plus Instellingen in de zijbalk
+const LINKS: NavLink[] = [
   { href: "/ontdek", label: "Ontdek" },
   { href: "/matches", label: "Matches" },
   { href: "/challenges", label: "Challenges" },
   { href: "/ranking", label: "Ranking" },
   { href: "/profiel", label: "Profiel" },
-] as const;
+  // Op mobiel is er geen plek voor een extra tab
+  { href: "/profiel/instellingen", label: "Instellingen", alleenDesktop: true },
+];
 
 // Mobiel: tabbalk onderaan. Vanaf lg: zijbalk links met het HUBi-logo.
 export function Navbar() {
   const pathname = usePathname();
+
+  const hoortBij = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
+
+  // Op desktop is alleen de meest specifieke link actief: /profiel/instellingen is niet ook /profiel
+  const meestSpecifiek = LINKS.filter((link) => hoortBij(link.href)).sort(
+    (a, b) => b.href.length - a.href.length
+  )[0]?.href;
 
   return (
     <nav
@@ -39,18 +51,24 @@ export function Navbar() {
       </Link>
 
       <ul className="grid h-[72px] grid-cols-6 lg:mt-4 lg:flex lg:h-auto lg:flex-1 lg:flex-col lg:gap-3">
-        {LINKS.map(({ href, label }) => {
-          const actief = pathname === href || pathname.startsWith(`${href}/`);
+        {LINKS.map(({ href, label, alleenDesktop }) => {
+          // Mobiel heeft geen Instellingen-tab: daar blijft Profiel actief
+          const actiefMobiel = hoortBij(href);
+          const actiefDesktop = href === meestSpecifiek;
 
           return (
-            <li key={href} className="contents">
+            <li key={href} className={alleenDesktop ? "hidden lg:contents" : "contents"}>
               <Link
                 href={href}
-                aria-current={actief ? "page" : undefined}
+                aria-current={actiefDesktop ? "page" : undefined}
                 className={`flex items-center justify-center text-[10px] font-medium uppercase transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-hubi-link lg:h-10 lg:justify-start lg:rounded-[10px] lg:px-5 lg:text-sm lg:font-normal lg:normal-case lg:focus-visible:outline-offset-0 ${
-                  actief
-                    ? "text-hubi-ink lg:bg-[#e6e8eb] lg:font-semibold"
-                    : "text-hubi-muted hover:text-hubi-ink lg:hover:bg-background"
+                  actiefMobiel
+                    ? "text-hubi-ink"
+                    : "text-hubi-muted hover:text-hubi-ink"
+                } ${
+                  actiefDesktop
+                    ? "lg:bg-[#e6e8eb] lg:font-semibold lg:text-hubi-ink"
+                    : "lg:text-hubi-muted lg:hover:bg-background lg:hover:text-hubi-ink"
                 }`}
               >
                 {label}
