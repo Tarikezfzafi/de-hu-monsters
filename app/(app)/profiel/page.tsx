@@ -19,11 +19,16 @@ async function Profiel() {
 
   if (!user) redirect("/login");
 
-  const { data: profiel } = await supabase
+  const { data: profiel, error: profielFout } = await supabase
     .from("profiles")
     .select("tribe, skills_heb, skills_leer, hobbys, avatar_url")
     .eq("id", user.id)
     .maybeSingle();
+
+  if (profielFout) {
+    console.error("Profiel ophalen mislukt:", profielFout);
+    throw new Error("Profielgegevens konden niet worden geladen.");
+  }
 
   const naam = user.user_metadata.full_name ?? "Jouw profiel";
 

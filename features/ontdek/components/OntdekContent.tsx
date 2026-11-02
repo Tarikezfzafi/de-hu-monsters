@@ -5,69 +5,51 @@ import { useMemo, useState, type FormEvent } from "react";
 const zoekcategorieen = ["Naam", "Skill/hobby", "Tribe"] as const;
 type Zoekcategorie = (typeof zoekcategorieen)[number];
 
+export type OntdekLid = {
+  id: string;
+  naam: string;
+  tribe: string;
+  skills: string[];
+  hobbys: string[];
+  avatarUrl: string | null;
+  match: number | null;
+  kleur: string;
+};
+
+type OntdekContentProps = {
+  leden: OntdekLid[];
+  fout?: string;
+};
+
 type Zoekcriterium = {
   categorie: Zoekcategorie;
   waarde: string;
 };
 
-const leden = [
-  {
-    naam: "Alex",
-    tribe: "Tribe B",
-    match: 92,
-    initialen: "A",
-    kleur: "from-blue-500 to-cyan-400",
-    skills: ["Linux", "Networking", "Python"],
-    hobbys: ["Gaming"],
-  },
-  {
-    naam: "Sophie",
-    tribe: "Tribe A",
-    match: 87,
-    initialen: "S",
-    kleur: "from-fuchsia-500 to-rose-400",
-    skills: [],
-    hobbys: ["Muziek", "Reizen", "Fotografie"],
-  },
-  {
-    naam: "Mees",
-    tribe: "Tribe B",
-    match: 76,
-    initialen: "M",
-    kleur: "from-violet-500 to-indigo-400",
-    skills: [],
-    hobbys: ["Fitness", "Gaming"],
-  },
-  {
-    naam: "Lina",
-    tribe: "Tribe C",
-    match: 68,
-    initialen: "L",
-    kleur: "from-emerald-500 to-teal-400",
-    skills: [],
-    hobbys: ["Koken", "Reizen"],
-  },
-];
-
-export function OntdekContent() {
+export function OntdekContent({ leden, fout }: OntdekContentProps) {
   const [zoekterm, setZoekterm] = useState("");
   const [zoekcategorie, setZoekcategorie] = useState<Zoekcategorie>("Naam");
   const [zoekcriteria, setZoekcriteria] = useState<Zoekcriterium[]>([]);
 
   const gevondenLeden = useMemo(() => {
+    const zoektermActief = zoekterm.trim();
+    const criteria = zoektermActief
+      ? [...zoekcriteria, { categorie: zoekcategorie, waarde: zoektermActief }]
+      : zoekcriteria;
+
     return leden.filter((lid) => {
-      return zoekcriteria.every(({ categorie, waarde }) => {
+      return criteria.every(({ categorie, waarde }) => {
         const zoek = waarde.toLocaleLowerCase("nl");
         const waarden = categorie === "Naam"
           ? [lid.naam]
           : categorie === "Skill/hobby"
             ? [...lid.skills, ...lid.hobbys]
-              : [lid.tribe];
+            : [lid.tribe];
 
         return waarden.some((veld) => veld.toLocaleLowerCase("nl").includes(zoek));
       });
     });
-  }, [zoekcriteria]);
+  }, [leden, zoekcategorie, zoekcriteria, zoekterm]);
 
   function voegCriteriumToe(waarde: string) {
     const zoekwaarde = waarde.trim();
@@ -109,7 +91,7 @@ export function OntdekContent() {
     return [...new Set(opties)]
       .filter((optie) => optie.toLocaleLowerCase("nl").startsWith(zoek))
       .slice(0, 6);
-  }, [zoekcategorie, zoekterm]);
+  }, [leden, zoekcategorie, zoekterm]);
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-[#f3f4f6]">
@@ -233,16 +215,32 @@ export function OntdekContent() {
             </p>
           </div>
 
-          {gevondenLeden.length > 0 ? (
+          {fout ? (
+            <div
+              role="alert"
+              className="mt-6 rounded-2xl border border-red-200 bg-white px-6 py-10 text-center"
+            >
+              <p className="font-semibold text-hubi-ink">Laden is niet gelukt</p>
+              <p className="mt-1 text-sm text-hubi-muted">{fout}</p>
+            </div>
+          ) : leden.length === 0 ? (
+            <div className="mt-6 rounded-2xl border border-dashed border-hubi-line bg-white/70 px-6 py-10 text-center">
+              <p className="font-semibold text-hubi-ink">
+                Er zijn nog geen andere profielen om te ontdekken
+              </p>
+            </div>
+          ) : gevondenLeden.length > 0 ? (
             <ul className="mt-6 grid list-none gap-4 p-0 sm:grid-cols-2">
               {gevondenLeden.map((lid) => (
-                <li key={lid.naam}>
+                <li key={lid.id}>
                   <article className="flex min-h-[142px] gap-4 rounded-2xl border border-white bg-white p-4 shadow-[0_4px_18px_rgba(20,23,28,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_10px_26px_rgba(20,23,28,0.09)] sm:p-5">
                     <div
-                      aria-label={`${lid.naam}, profielfoto niet beschikbaar`}
-                      className={`flex size-[52px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${lid.kleur} text-lg font-bold text-white shadow-sm`}
+                      role="img"
+                      aria-label={`${lid.naam}, profielfoto`}
+                      className={`flex size-[52px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br bg-cover bg-center ${lid.kleur} text-lg font-bold text-white shadow-sm`}
+                      style={lid.avatarUrl ? { backgroundImage: `url("${lid.avatarUrl}")` } : undefined}
                     >
-                      {lid.initialen}
+                      {!lid.avatarUrl && lid.naam.slice(0, 1).toLocaleUpperCase("nl")}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
@@ -254,12 +252,14 @@ export function OntdekContent() {
                             ICT · {lid.tribe}
                           </p>
                         </div>
-                        <span
-                          className="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-semibold text-hubi-link"
-                          aria-label={`${lid.match}% match`}
-                        >
-                          {lid.match}%
-                        </span>
+                        {lid.match !== null && (
+                          <span
+                            className="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-semibold text-hubi-link"
+                            aria-label={`${lid.match}% match`}
+                          >
+                            {lid.match}%
+                          </span>
+                        )}
                       </div>
                       <ul aria-label="Interesses" className="mt-3 flex flex-wrap gap-1.5">
                         {[...lid.skills, ...lid.hobbys].map((tag, index) => (
