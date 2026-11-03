@@ -16,7 +16,11 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${safeNext}`);
+      // Net bevestigd account: naar het profiel, met een eenmalige melding
+      const nieuwAccount = type === "signup" || type === "email";
+      const bestemming = nieuwAccount ? "/profiel?melding=account-bevestigd" : safeNext;
+
+      return NextResponse.redirect(`${origin}${bestemming}`);
     }
   }
 
