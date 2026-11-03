@@ -145,7 +145,7 @@ export function OntdekContent({ leden, fout }: OntdekContentProps) {
                 onChange={(event) => setZoekterm(event.target.value)}
                 aria-label={`Zoek op ${zoekcategorie.toLocaleLowerCase("nl")}`}
                 placeholder={`Zoek ${zoekcategorie === "Naam" ? "een naam" : `een ${zoekcategorie.toLocaleLowerCase("nl")}`}...`}
-                className="h-12 min-w-0 flex-1 rounded-2xl border border-hubi-line bg-white px-4 text-sm text-hubi-ink shadow-sm outline-none transition placeholder:text-hubi-muted focus:border-[#7771d7] focus:ring-4 focus:ring-[#7771d7]/10"
+                className="h-12 min-w-0 rounded-2xl border border-hubi-line bg-white px-4 text-sm text-hubi-ink shadow-sm outline-none transition sm:flex-1 placeholder:text-hubi-muted focus:border-[#7771d7] focus:ring-4 focus:ring-[#7771d7]/10"
               />
               <button
                 type="submit"
