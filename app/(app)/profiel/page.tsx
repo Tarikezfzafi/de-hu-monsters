@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProfielForm } from "@/features/profiel/components/ProfielForm";
+import { AccountBevestigdMelding } from "@/features/profiel/components/AccountBevestigdMelding";
 import { connection } from "next/server";
 
 export const metadata: Metadata = {
@@ -30,11 +31,20 @@ async function Profiel() {
   return <ProfielForm naam={naam} profiel={profiel} />;
 }
 
-export default function ProfielPage() {
+// Toont eenmalig een melding als je net je e-mailadres hebt bevestigd (/confirm stuurt hierheen)
+async function Melding({ searchParams }: Pick<PageProps<"/profiel">, "searchParams">) {
+  const { melding } = await searchParams;
+
+  return melding === "account-bevestigd" ? <AccountBevestigdMelding /> : null;
+}
+
+export default function ProfielPage({ searchParams }: PageProps<"/profiel">) {
   return (
     <main className="flex flex-1 justify-center px-5 pt-12 pb-10 lg:px-16 lg:py-24">
       <div className="w-full max-w-[350px] lg:max-w-[790px]">
-        
+        <Suspense fallback={null}>
+          <Melding searchParams={searchParams} />
+        </Suspense>
 
         <Suspense fallback={<p className="mt-4 text-sm text-hubi-muted">Laden...</p>}>
           <Profiel />
