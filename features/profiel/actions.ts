@@ -155,6 +155,7 @@ export async function saveProfile(
   // 4. Profiel opslaan (aanmaken of bijwerken)
   const { error } = await supabase.from("profiles").upsert({
     id: user.id,
+    display_name: user.user_metadata.full_name ?? null,
     tribe: result.data.tribe,
     skills_heb: result.data.skillsHeb,
     skills_leer: result.data.skillsLeer,
