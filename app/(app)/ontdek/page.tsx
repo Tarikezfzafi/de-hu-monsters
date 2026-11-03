@@ -23,6 +23,21 @@ async function OntdekData() {
 
   const { profielen, eigenId } = resultaat;
   const eigenProfiel = profielen.find((profiel) => profiel.id === eigenId);
+
+  // Eigen kaart bovenaan Ontdek (null = nog geen profiel opgeslagen)
+  const eigenLid: OntdekLid | null = eigenProfiel
+    ? {
+        id: eigenProfiel.id,
+        naam: eigenProfiel.naam,
+        tribe: eigenProfiel.tribe,
+        skills: [...new Set([...eigenProfiel.skills_heb, ...eigenProfiel.skills_leer])],
+        hobbys: eigenProfiel.hobbys,
+        avatarUrl: eigenProfiel.avatar_url,
+        match: null, // geen % voor jezelf
+        kleur: "from-slate-600 to-slate-400",
+      }
+    : null;
+
   const eigenInteresses = new Set(
     [
       ...(eigenProfiel?.skills_heb ?? []),
@@ -69,7 +84,7 @@ async function OntdekData() {
       };
     });
 
-  return <OntdekContent leden={leden} />;
+  return <OntdekContent leden={leden} eigenLid={eigenLid} />;
 }
 
 export default function OntdekPage() {
