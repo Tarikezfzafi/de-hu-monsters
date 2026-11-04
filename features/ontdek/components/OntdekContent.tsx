@@ -1,36 +1,75 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { leden } from "@/features/ontdek/leden";
+import { useMemo, useState, type FormEvent } from "react";
+import { LidKaart } from "./LidKaart";
 
 const zoekcategorieen = ["Naam", "Skill/hobby", "Tribe"] as const;
 type Zoekcategorie = (typeof zoekcategorieen)[number];
+
+export type OntdekLid = {
+  id: string;
+  naam: string;
+  tribe: string;
+  skills: string[];
+  hobbys: string[];
+  avatarUrl: string | null;
+  match: number | null;
+  kleur: string;
+};
+
+type OntdekContentProps = {
+  leden: OntdekLid[];
+  eigenLid?: OntdekLid | null;
+  fout?: string;
+};
 
 type Zoekcriterium = {
   categorie: Zoekcategorie;
   waarde: string;
 };
 
-export function OntdekContent() {
+export function OntdekContent({ leden, eigenLid, fout }: OntdekContentProps) {
   const [zoekterm, setZoekterm] = useState("");
   const [zoekcategorie, setZoekcategorie] = useState<Zoekcategorie>("Naam");
   const [zoekcriteria, setZoekcriteria] = useState<Zoekcriterium[]>([]);
 
   const gevondenLeden = useMemo(() => {
+    const zoektermActief = zoekterm.trim();
+    const criteria = zoektermActief
+      ? [...zoekcriteria, { categorie: zoekcategorie, waarde: zoektermActief }]
+      : zoekcriteria;
+
     return leden.filter((lid) => {
-      return zoekcriteria.every(({ categorie, waarde }) => {
+      return criteria.every(({ categorie, waarde }) => {
         const zoek = waarde.toLocaleLowerCase("nl");
         const waarden = categorie === "Naam"
           ? [lid.naam]
           : categorie === "Skill/hobby"
             ? [...lid.skills, ...lid.hobbys]
-              : [lid.tribe];
+            : [lid.tribe];
 
         return waarden.some((veld) => veld.toLocaleLowerCase("nl").includes(zoek));
       });
     });
-  }, [zoekcriteria]);
+  }, [leden, zoekcategorie, zoekcriteria, zoekterm]);
+
+  const zoekopties = useMemo(() => {
+    const zoek = zoekterm.trim().toLocaleLowerCase("nl");
+    if (!zoek) return [];
+
+    const opties = leden.flatMap((lid) =>
+      zoekcategorie === "Naam"
+        ? [lid.naam]
+        : zoekcategorie === "Skill/hobby"
+          ? [...lid.skills, ...lid.hobbys]
+          : [lid.tribe]
+    );
+
+    return [...new Set(opties)]
+      .filter((optie) => optie.toLocaleLowerCase("nl").startsWith(zoek))
+      .slice(0, 6);
+  }, [leden, zoekcategorie, zoekterm]);
 
   function voegCriteriumToe(waarde: string) {
     const zoekwaarde = waarde.trim();
@@ -57,23 +96,6 @@ export function OntdekContent() {
     voegCriteriumToe(zoekterm);
   }
 
-  const zoekopties = useMemo(() => {
-    const zoek = zoekterm.trim().toLocaleLowerCase("nl");
-    if (!zoek) return [];
-
-    const opties = leden.flatMap((lid) =>
-      zoekcategorie === "Naam"
-        ? [lid.naam]
-        : zoekcategorie === "Skill/hobby"
-          ? [...lid.skills, ...lid.hobbys]
-          : [lid.tribe]
-    );
-
-    return [...new Set(opties)]
-      .filter((optie) => optie.toLocaleLowerCase("nl").startsWith(zoek))
-      .slice(0, 6);
-  }, [zoekcategorie, zoekterm]);
-
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-[#f3f4f6]">
       <main className="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
@@ -91,6 +113,16 @@ export function OntdekContent() {
               Vind jouw match ✨
             </span>
           </div>
+
+          {/* Nog geen profiel opgeslagen: duwtje naar de profielpagina */}
+          {!eigenLid && !fout && (
+            <p className="mt-6 rounded-2xl border border-dashed border-hubi-line bg-white/70 p-4 text-sm text-hubi-muted">
+              Je staat nog niet op Ontdek.{" "}
+              <Link href="/profiel" className="text-hubi-link hover:underline">
+                Vul je profiel in →
+              </Link>
+            </p>
+          )}
 
           <div className="mt-6 max-w-[620px]">
             <form
@@ -193,7 +225,21 @@ export function OntdekContent() {
             </p>
           </div>
 
-          {gevondenLeden.length > 0 ? (
+          {fout ? (
+            <div
+              role="alert"
+              className="mt-6 rounded-2xl border border-red-200 bg-white px-6 py-10 text-center"
+            >
+              <p className="font-semibold text-hubi-ink">Laden is niet gelukt</p>
+              <p className="mt-1 text-sm text-hubi-muted">{fout}</p>
+            </div>
+          ) : leden.length === 0 ? (
+            <div className="mt-6 rounded-2xl border border-dashed border-hubi-line bg-white/70 px-6 py-10 text-center">
+              <p className="font-semibold text-hubi-ink">
+                Er zijn nog geen andere profielen om te ontdekken
+              </p>
+            </div>
+          ) : gevondenLeden.length > 0 ? (
             <ul className="mt-6 grid list-none gap-4 p-0 sm:grid-cols-2">
               {gevondenLeden.map((lid) => (
                 <li key={lid.id}>
@@ -201,48 +247,7 @@ export function OntdekContent() {
                     href={`/profiel/${lid.id}`}
                     className="block rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hubi-link"
                   >
-                    <article className="flex min-h-[142px] gap-4 rounded-2xl border border-white bg-white p-4 shadow-[0_4px_18px_rgba(20,23,28,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_10px_26px_rgba(20,23,28,0.09)] sm:p-5">
-                      <div
-                        aria-label={`${lid.naam}, profielfoto niet beschikbaar`}
-                        className={`flex size-[52px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${lid.kleur} text-lg font-bold text-white shadow-sm`}
-                      >
-                        {lid.initialen}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h2 className="text-sm font-semibold text-hubi-ink">
-                              {lid.naam}
-                            </h2>
-                            <p className="mt-1 text-xs text-hubi-muted">
-                              ICT · {lid.tribe}
-                            </p>
-                          </div>
-                          <span
-                            className="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-semibold text-hubi-link"
-                            aria-label={`${lid.match}% match`}
-                          >
-                            {lid.match}%
-                          </span>
-                        </div>
-                        <ul aria-label="Interesses" className="mt-3 flex flex-wrap gap-1.5">
-                          {[...lid.skills, ...lid.hobbys].map((tag, index) => (
-                            <li
-                              key={tag}
-                              className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                                index === 0
-                                  ? "bg-blue-50 text-[#315da7]"
-                                  : index === 1
-                                    ? "bg-fuchsia-50 text-[#8b4386]"
-                                    : "bg-emerald-50 text-[#287866]"
-                              }`}
-                            >
-                              {tag}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </article>
+                    <LidKaart lid={lid} />
                   </Link>
                 </li>
               ))}

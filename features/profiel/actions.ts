@@ -23,6 +23,79 @@ export type ProfielState = {
   message?: string;
 };
 
+export type OntdekProfiel = {
+  id: string;
+  naam: string;
+  tribe: string;
+  skills_heb: string[];
+  skills_leer: string[];
+  hobbys: string[];
+  avatar_url: string | null;
+};
+
+export type OntdekProfielenResult =
+  | { profielen: OntdekProfiel[]; eigenId: string }
+  | { fout: string };
+
+function leesTekst(waarden: Record<string, unknown>, sleutels: string[]) {
+  for (const sleutel of sleutels) {
+    const waarde = waarden[sleutel];
+    if (typeof waarde === "string" && waarde.trim()) return waarde.trim();
+  }
+
+  return null;
+}
+
+function leesTeksten(waarde: unknown) {
+  return Array.isArray(waarde)
+    ? waarde.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+export async function getOntdekProfielen(): Promise<OntdekProfielenResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error("Ingelogde gebruiker voor ontdekpagina ophalen mislukt:", userError);
+    return { fout: "Je gegevens konden niet worden geladen. Probeer het opnieuw." };
+  }
+
+  if (!user) redirect("/login");
+
+  const { data, error } = await supabase.from("profiles").select("*");
+
+  if (error) {
+    console.error("Ontdekprofielen ophalen mislukt:", error);
+    return { fout: "Profielen konden niet worden geladen. Probeer het later opnieuw." };
+  }
+
+  const profielen = (data as Record<string, unknown>[])
+    .flatMap((record): OntdekProfiel[] => {
+      const id = leesTekst(record, ["id"]);
+      const tribe = leesTekst(record, ["tribe"]);
+      if (!id || !tribe) return [];
+
+      const naam = leesTekst(record, ["display_name", "full_name", "name"])
+        ?? `HUBi-lid ${id.slice(0, 6)}`;
+
+      return [{
+        id,
+        naam,
+        tribe,
+        skills_heb: leesTeksten(record.skills_heb),
+        skills_leer: leesTeksten(record.skills_leer),
+        hobbys: leesTeksten(record.hobbys),
+        avatar_url: typeof record.avatar_url === "string" ? record.avatar_url : null,
+      }];
+    });
+
+  return { profielen, eigenId: user.id };
+}
+
 export async function saveProfile(
   _prevState: ProfielState,
   formData: FormData,
@@ -60,48 +133,29 @@ export async function saveProfile(
 
   if (!user) redirect("/login");
 
-  // 3. Foto uploaden naar de map van deze gebruiker
+  // 3. Nieuwe foto eerst uploaden; de huidige foto blijft beschikbaar tot het profiel is opgeslagen
   let avatarUrl: string | undefined;
+  let avatarPad: string | undefined;
 
   if (heeftFoto) {
-    // Oude foto('s) eerst weghalen, zodat er maar één per gebruiker bewaard blijft
-    const { data: oud } = await supabase.storage.from("avatars").list(user.id);
-    if (oud?.length) {
-      await supabase.storage
-        .from("avatars")
-        .remove(oud.map((bestand) => `${user.id}/${bestand.name}`));
-    }
-
-    const pad = `${user.id}/avatar-${Date.now()}`;
+    avatarPad = `${user.id}/avatar-${Date.now()}`;
     const { error } = await supabase.storage
       .from("avatars")
-      .upload(pad, foto, { contentType: foto.type, upsert: true });
+      .upload(avatarPad, foto, { contentType: foto.type, upsert: true });
 
     if (error) {
       console.error(error);
       return { message: "Foto uploaden is mislukt. Probeer het opnieuw." };
     }
 
-    avatarUrl = supabase.storage.from("avatars").getPublicUrl(pad)
+    avatarUrl = supabase.storage.from("avatars").getPublicUrl(avatarPad)
       .data.publicUrl;
-  }
-
-  // 3b. Foto verwijderen: alle bestanden in de map van deze gebruiker weghalen
-  if (verwijderFoto) {
-    const { data: bestanden } = await supabase.storage
-      .from("avatars")
-      .list(user.id);
-
-    if (bestanden?.length) {
-      await supabase.storage
-        .from("avatars")
-        .remove(bestanden.map((bestand) => `${user.id}/${bestand.name}`));
-    }
   }
 
   // 4. Profiel opslaan (aanmaken of bijwerken)
   const { error } = await supabase.from("profiles").upsert({
     id: user.id,
+    display_name: user.user_metadata.full_name ?? null,
     tribe: result.data.tribe,
     skills_heb: result.data.skillsHeb,
     skills_leer: result.data.skillsLeer,
@@ -113,9 +167,39 @@ export async function saveProfile(
 
   if (error) {
     console.error(error);
+
+    if (avatarPad) {
+      const { error: verwijderFout } = await supabase.storage
+        .from("avatars")
+        .remove([avatarPad]);
+      if (verwijderFout) console.error(verwijderFout);
+    }
+
     return { message: "Profiel opslaan is mislukt. Probeer het opnieuw." };
   }
 
-  // 5. Doorsturen
-  redirect("/");
+  // 5. Oude bestanden pas opruimen nadat de database de nieuwe avatar kent
+  if (avatarPad || verwijderFoto) {
+    const { data: bestanden, error: lijstFout } = await supabase.storage
+      .from("avatars")
+      .list(user.id);
+
+    if (lijstFout) {
+      console.error(lijstFout);
+    } else {
+      const oudePaden = bestanden
+        .map((bestand) => `${user.id}/${bestand.name}`)
+        .filter((pad) => pad !== avatarPad);
+
+      if (oudePaden.length) {
+        const { error: verwijderFout } = await supabase.storage
+          .from("avatars")
+          .remove(oudePaden);
+        if (verwijderFout) console.error(verwijderFout);
+      }
+    }
+  }
+
+  // 6. Doorsturen
+  redirect("/ontdek");
 }
