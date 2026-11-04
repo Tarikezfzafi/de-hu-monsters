@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState, type FormEvent } from "react";
+import Link from "next/link";
+import { leden } from "@/features/ontdek/leden";
 
 const zoekcategorieen = ["Naam", "Skill/hobby", "Tribe"] as const;
 type Zoekcategorie = (typeof zoekcategorieen)[number];
@@ -9,45 +11,6 @@ type Zoekcriterium = {
   categorie: Zoekcategorie;
   waarde: string;
 };
-
-const leden = [
-  {
-    naam: "Alex",
-    tribe: "Tribe B",
-    match: 92,
-    initialen: "A",
-    kleur: "from-blue-500 to-cyan-400",
-    skills: ["Linux", "Networking", "Python"],
-    hobbys: ["Gaming"],
-  },
-  {
-    naam: "Sophie",
-    tribe: "Tribe A",
-    match: 87,
-    initialen: "S",
-    kleur: "from-fuchsia-500 to-rose-400",
-    skills: [],
-    hobbys: ["Muziek", "Reizen", "Fotografie"],
-  },
-  {
-    naam: "Mees",
-    tribe: "Tribe B",
-    match: 76,
-    initialen: "M",
-    kleur: "from-violet-500 to-indigo-400",
-    skills: [],
-    hobbys: ["Fitness", "Gaming"],
-  },
-  {
-    naam: "Lina",
-    tribe: "Tribe C",
-    match: 68,
-    initialen: "L",
-    kleur: "from-emerald-500 to-teal-400",
-    skills: [],
-    hobbys: ["Koken", "Reizen"],
-  },
-];
 
 export function OntdekContent() {
   const [zoekterm, setZoekterm] = useState("");
@@ -233,49 +196,54 @@ export function OntdekContent() {
           {gevondenLeden.length > 0 ? (
             <ul className="mt-6 grid list-none gap-4 p-0 sm:grid-cols-2">
               {gevondenLeden.map((lid) => (
-                <li key={lid.naam}>
-                  <article className="flex min-h-[142px] gap-4 rounded-2xl border border-white bg-white p-4 shadow-[0_4px_18px_rgba(20,23,28,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_10px_26px_rgba(20,23,28,0.09)] sm:p-5">
-                    <div
-                      aria-label={`${lid.naam}, profielfoto niet beschikbaar`}
-                      className={`flex size-[52px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${lid.kleur} text-lg font-bold text-white shadow-sm`}
-                    >
-                      {lid.initialen}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h2 className="text-sm font-semibold text-hubi-ink">
-                            {lid.naam}
-                          </h2>
-                          <p className="mt-1 text-xs text-hubi-muted">
-                            ICT · {lid.tribe}
-                          </p>
-                        </div>
-                        <span
-                          className="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-semibold text-hubi-link"
-                          aria-label={`${lid.match}% match`}
-                        >
-                          {lid.match}%
-                        </span>
+                <li key={lid.id}>
+                  <Link
+                    href={`/profiel/${lid.id}`}
+                    className="block rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hubi-link"
+                  >
+                    <article className="flex min-h-[142px] gap-4 rounded-2xl border border-white bg-white p-4 shadow-[0_4px_18px_rgba(20,23,28,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_10px_26px_rgba(20,23,28,0.09)] sm:p-5">
+                      <div
+                        aria-label={`${lid.naam}, profielfoto niet beschikbaar`}
+                        className={`flex size-[52px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${lid.kleur} text-lg font-bold text-white shadow-sm`}
+                      >
+                        {lid.initialen}
                       </div>
-                      <ul aria-label="Interesses" className="mt-3 flex flex-wrap gap-1.5">
-                        {[...lid.skills, ...lid.hobbys].map((tag, index) => (
-                          <li
-                            key={tag}
-                            className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                              index === 0
-                                ? "bg-blue-50 text-[#315da7]"
-                                : index === 1
-                                  ? "bg-fuchsia-50 text-[#8b4386]"
-                                  : "bg-emerald-50 text-[#287866]"
-                            }`}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h2 className="text-sm font-semibold text-hubi-ink">
+                              {lid.naam}
+                            </h2>
+                            <p className="mt-1 text-xs text-hubi-muted">
+                              ICT · {lid.tribe}
+                            </p>
+                          </div>
+                          <span
+                            className="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-semibold text-hubi-link"
+                            aria-label={`${lid.match}% match`}
                           >
-                            {tag}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </article>
+                            {lid.match}%
+                          </span>
+                        </div>
+                        <ul aria-label="Interesses" className="mt-3 flex flex-wrap gap-1.5">
+                          {[...lid.skills, ...lid.hobbys].map((tag, index) => (
+                            <li
+                              key={tag}
+                              className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                                index === 0
+                                  ? "bg-blue-50 text-[#315da7]"
+                                  : index === 1
+                                    ? "bg-fuchsia-50 text-[#8b4386]"
+                                    : "bg-emerald-50 text-[#287866]"
+                              }`}
+                            >
+                              {tag}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </article>
+                  </Link>
                 </li>
               ))}
             </ul>
