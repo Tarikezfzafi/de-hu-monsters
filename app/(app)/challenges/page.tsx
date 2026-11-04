@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ChallengeKnoppen } from "@/features/challenges/components/ChallengeKnoppen";
 
 export const metadata: Metadata = {
   title: "Challenges | HUBi",
@@ -12,6 +13,11 @@ export default function ChallengesPage() {
         <p className="mt-1 text-[13px] text-hubi-muted lg:mt-2 lg:text-sm">
           Dit scherm komt binnenkort.
         </p>
+
+        {/* Tijdelijk breedte van de kaartinhoud (350/540 min padding); verdwijnt zodra de Voorstel-kaart er is */}
+        <div className="mt-6 max-w-[318px] lg:max-w-[492px]">
+          <ChallengeKnoppen />
+        </div>
       </div>
     </main>
   );
