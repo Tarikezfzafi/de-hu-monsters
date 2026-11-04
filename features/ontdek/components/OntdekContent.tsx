@@ -243,7 +243,12 @@ export function OntdekContent({ leden, eigenLid, fout }: OntdekContentProps) {
             <ul className="mt-6 grid list-none gap-4 p-0 sm:grid-cols-2">
               {gevondenLeden.map((lid) => (
                 <li key={lid.id}>
-                  <LidKaart lid={lid} />
+                  <Link
+                    href={`/profiel/${lid.id}`}
+                    className="block rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hubi-link"
+                  >
+                    <LidKaart lid={lid} />
+                  </Link>
                 </li>
               ))}
             </ul>
