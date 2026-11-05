@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { ChallengesKop } from "@/features/challenges/components/ChallengesKop";
+import { ChallengesOverzicht } from "@/features/challenges/components/ChallengesOverzicht";
 
 export const metadata: Metadata = {
   title: "Challenges | HUBi",
@@ -6,12 +8,10 @@ export const metadata: Metadata = {
 
 export default function ChallengesPage() {
   return (
-    <main className="flex flex-1 justify-center px-5 pt-12 pb-10 lg:px-16 lg:py-24">
-      <div className="w-full max-w-[350px] lg:max-w-[790px]">
-        <h1 className="text-[26px] font-bold lg:text-[28px]">Challenges</h1>
-        <p className="mt-1 text-[13px] text-hubi-muted lg:mt-2 lg:text-sm">
-          Dit scherm komt binnenkort.
-        </p>
+    <main className="min-w-0 flex-1 px-5 pt-[41px] pb-10 lg:px-12 lg:pt-[83px]">
+      <div className="mx-auto flex max-w-[1104px] flex-col gap-3 lg:gap-[34px]">
+        <ChallengesKop />
+        <ChallengesOverzicht />
       </div>
     </main>
   );
