@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { ChallengeVoorstel } from "../types";
+import type { ChallengeBezig, ChallengeVoorstel } from "../types";
+import { BezigKaarten } from "./BezigKaarten";
 import { LeegKaart } from "./LeegKaart";
 import { VoorstelKaart } from "./VoorstelKaart";
 
@@ -10,11 +11,16 @@ type Tab = (typeof tabs)[number];
 
 type ChallengesOverzichtProps = {
   voorstel?: ChallengeVoorstel;
+  bezig?: ChallengeBezig[];
 };
 
 // Tabs en inhoud van het challengescherm. Zonder challenges in de gekozen tab staat de lege staat.
-export function ChallengesOverzicht({ voorstel }: ChallengesOverzichtProps) {
+export function ChallengesOverzicht({ voorstel, bezig = [] }: ChallengesOverzichtProps) {
   const [actief, setActief] = useState<Tab>("Open");
+
+  // Open toont alle secties, Bezig alleen de challenges waaraan je werkt
+  const toonVoorstel = actief === "Open" ? voorstel : undefined;
+  const toonBezig = actief === "Open" || actief === "Bezig" ? bezig : [];
 
   return (
     <div className="flex flex-col gap-3 lg:gap-7">
@@ -36,10 +42,10 @@ export function ChallengesOverzicht({ voorstel }: ChallengesOverzichtProps) {
         ))}
       </div>
 
-      {actief === "Open" && voorstel ? (
-        // Op desktop staat het voorstel links; de Bezig-kaart komt in de rechterkolom
-        <div className="grid gap-3 lg:grid-cols-2 lg:gap-6">
-          <VoorstelKaart voorstel={voorstel} />
+      {toonVoorstel || toonBezig.length > 0 ? (
+        <div className="grid items-start gap-3 lg:grid-cols-2 lg:gap-6">
+          {toonVoorstel && <VoorstelKaart voorstel={toonVoorstel} />}
+          {toonBezig.length > 0 && <BezigKaarten challenges={toonBezig} />}
         </div>
       ) : (
         <div className="mt-0.5 lg:mt-0">

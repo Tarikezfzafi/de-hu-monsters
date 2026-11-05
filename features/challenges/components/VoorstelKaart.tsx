@@ -1,5 +1,7 @@
 import type { ChallengeVoorstel } from "../types";
 import { ChallengeKnoppen } from "./ChallengeKnoppen";
+import { PartnerRegel } from "./PartnerRegel";
+import { SectieKop } from "./SectieKop";
 
 type VoorstelKaartProps = {
   voorstel: ChallengeVoorstel;
@@ -11,15 +13,7 @@ export function VoorstelKaart({ voorstel }: VoorstelKaartProps) {
 
   return (
     <section aria-labelledby="voorstel-sectie" className="flex min-w-0 flex-col gap-2">
-      <div className="flex items-center justify-between gap-2 text-hubi-muted">
-        <h2
-          id="voorstel-sectie"
-          className="text-[11px] leading-[13px] font-medium tracking-[1px] uppercase"
-        >
-          Voorstel
-        </h2>
-        <p className="text-[10px] leading-[13px] lg:text-[11px]">1 · Accepteren</p>
-      </div>
+      <SectieKop id="voorstel-sectie" titel="Voorstel" stap="1 · Accepteren" />
 
       <article
         aria-labelledby={kopId}
@@ -39,18 +33,7 @@ export function VoorstelKaart({ voorstel }: VoorstelKaartProps) {
           +{voorstel.xp} XP · {voorstel.soort ?? "Team challenge"}
         </p>
 
-        <div className="flex items-center gap-2">
-          <div
-            aria-hidden="true"
-            className="size-7 shrink-0 rounded-full bg-hubi-ink/8 bg-cover bg-center"
-            style={
-              voorstel.partnerAvatarUrl
-                ? { backgroundImage: `url("${voorstel.partnerAvatarUrl}")` }
-                : undefined
-            }
-          />
-          <p className="text-[13px] text-hubi-ink">met {voorstel.partner}</p>
-        </div>
+        <PartnerRegel partner={voorstel.partner} avatarUrl={voorstel.partnerAvatarUrl} />
 
         <ChallengeKnoppen />
       </article>
