@@ -21,3 +21,19 @@ export type ChallengeBezig = ChallengePartner & {
   // Waar je het bewijs voor deze challenge indient
   bewijsHref: string;
 };
+
+// Een challenge die de docent heeft beoordeeld
+export type ChallengeAfgerond =
+  | {
+      id: string;
+      titel: string;
+      status: "Goedgekeurd";
+      xp: number;
+    }
+  | {
+      id: string;
+      titel: string;
+      status: "Afgekeurd";
+      // Waar je het bewijs opnieuw indient
+      opnieuwHref: string;
+    };

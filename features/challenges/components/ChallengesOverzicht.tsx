@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { ChallengeBezig, ChallengeVoorstel } from "../types";
+import type { ChallengeAfgerond, ChallengeBezig, ChallengeVoorstel } from "../types";
+import { AfgerondRijen } from "./AfgerondRijen";
 import { BezigKaarten } from "./BezigKaarten";
 import { LeegKaart } from "./LeegKaart";
 import { VoorstelKaart } from "./VoorstelKaart";
@@ -12,15 +13,21 @@ type Tab = (typeof tabs)[number];
 type ChallengesOverzichtProps = {
   voorstel?: ChallengeVoorstel;
   bezig?: ChallengeBezig[];
+  afgerond?: ChallengeAfgerond[];
 };
 
 // Tabs en inhoud van het challengescherm. Zonder challenges in de gekozen tab staat de lege staat.
-export function ChallengesOverzicht({ voorstel, bezig = [] }: ChallengesOverzichtProps) {
+export function ChallengesOverzicht({
+  voorstel,
+  bezig = [],
+  afgerond = [],
+}: ChallengesOverzichtProps) {
   const [actief, setActief] = useState<Tab>("Open");
 
-  // Open toont alle secties, Bezig alleen de challenges waaraan je werkt
+  // Open toont alle secties; Bezig en Afgerond alleen hun eigen sectie
   const toonVoorstel = actief === "Open" ? voorstel : undefined;
   const toonBezig = actief === "Open" || actief === "Bezig" ? bezig : [];
+  const toonAfgerond = actief === "Open" || actief === "Afgerond" ? afgerond : [];
 
   return (
     <div className="flex flex-col gap-3 lg:gap-7">
@@ -42,10 +49,15 @@ export function ChallengesOverzicht({ voorstel, bezig = [] }: ChallengesOverzich
         ))}
       </div>
 
-      {toonVoorstel || toonBezig.length > 0 ? (
-        <div className="grid items-start gap-3 lg:grid-cols-2 lg:gap-6">
+      {toonVoorstel || toonBezig.length > 0 || toonAfgerond.length > 0 ? (
+        <div className="grid items-start gap-x-6 gap-y-3 lg:grid-cols-2 lg:gap-y-7">
           {toonVoorstel && <VoorstelKaart voorstel={toonVoorstel} />}
           {toonBezig.length > 0 && <BezigKaarten challenges={toonBezig} />}
+          {toonAfgerond.length > 0 && (
+            <div className="lg:col-span-2">
+              <AfgerondRijen challenges={toonAfgerond} />
+            </div>
+          )}
         </div>
       ) : (
         <div className="mt-0.5 lg:mt-0">
