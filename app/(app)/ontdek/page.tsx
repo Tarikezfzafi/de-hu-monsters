@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { getOntdekProfielen } from "@/features/profiel/actions";
 import { OntdekContent, type OntdekLid } from "@/features/ontdek/components/OntdekContent";
+import { berekenMatch, kleurVoor, skillsVan } from "@/features/ontdek/match";
 
 export const metadata: Metadata = {
   title: "Ontdek | HUBi",
@@ -30,7 +31,7 @@ async function OntdekData() {
         id: eigenProfiel.id,
         naam: eigenProfiel.naam,
         tribe: eigenProfiel.tribe,
-        skills: [...new Set([...eigenProfiel.skills_heb, ...eigenProfiel.skills_leer])],
+        skills: skillsVan(eigenProfiel),
         hobbys: eigenProfiel.hobbys,
         avatarUrl: eigenProfiel.avatar_url,
         match: null, // geen % voor jezelf
@@ -38,51 +39,18 @@ async function OntdekData() {
       }
     : null;
 
-  const eigenInteresses = new Set(
-    [
-      ...(eigenProfiel?.skills_heb ?? []),
-      ...(eigenProfiel?.skills_leer ?? []),
-      ...(eigenProfiel?.hobbys ?? []),
-    ].map((interesse) => interesse.toLocaleLowerCase("nl"))
-  );
-
   const leden = profielen
     .filter((profiel) => profiel.id !== eigenId)
-    .map((profiel, index): OntdekLid => {
-      const skills = [
-        ...new Set([
-          ...profiel.skills_heb,
-          ...profiel.skills_leer,
-        ]),
-      ];
-      const hobbys = profiel.hobbys;
-      const interesses = new Set(
-        [...skills, ...hobbys].map((interesse) => interesse.toLocaleLowerCase("nl"))
-      );
-      const gedeeld = [...interesses].filter((interesse) =>
-        eigenInteresses.has(interesse)
-      ).length;
-      const union = new Set([...eigenInteresses, ...interesses]);
-      const match = eigenInteresses.size > 0 && union.size > 0
-        ? Math.round((gedeeld / union.size) * 100)
-        : null;
-
-      return {
-        id: profiel.id,
-        naam: profiel.naam,
-        tribe: profiel.tribe,
-        skills,
-        hobbys,
-        avatarUrl: profiel.avatar_url,
-        match,
-        kleur: [
-          "from-blue-500 to-cyan-400",
-          "from-fuchsia-500 to-rose-400",
-          "from-violet-500 to-indigo-400",
-          "from-emerald-500 to-teal-400",
-        ][index % 4],
-      };
-    });
+    .map((profiel, index): OntdekLid => ({
+      id: profiel.id,
+      naam: profiel.naam,
+      tribe: profiel.tribe,
+      skills: skillsVan(profiel),
+      hobbys: profiel.hobbys,
+      avatarUrl: profiel.avatar_url,
+      match: berekenMatch(eigenProfiel, profiel),
+      kleur: kleurVoor(index),
+    }));
 
   return <OntdekContent leden={leden} eigenLid={eigenLid} />;
 }
