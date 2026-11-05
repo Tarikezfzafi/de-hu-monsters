@@ -1,17 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import type { ChallengeVoorstel } from "../types";
 import { LeegKaart } from "./LeegKaart";
+import { VoorstelKaart } from "./VoorstelKaart";
 
 const tabs = ["Open", "Bezig", "Afgerond"] as const;
 type Tab = (typeof tabs)[number];
 
-// Tabs en inhoud van het challengescherm. Zolang er geen challenges zijn, toont elke tab de lege staat.
-export function ChallengesOverzicht() {
+type ChallengesOverzichtProps = {
+  voorstel?: ChallengeVoorstel;
+};
+
+// Tabs en inhoud van het challengescherm. Zonder challenges in de gekozen tab staat de lege staat.
+export function ChallengesOverzicht({ voorstel }: ChallengesOverzichtProps) {
   const [actief, setActief] = useState<Tab>("Open");
 
   return (
-    <div className="flex flex-col gap-[14px] lg:gap-7">
+    <div className="flex flex-col gap-3 lg:gap-7">
       <div role="group" aria-label="Soort challenges" className="flex gap-2">
         {tabs.map((tab) => (
           <button
@@ -30,7 +36,16 @@ export function ChallengesOverzicht() {
         ))}
       </div>
 
-      <LeegKaart />
+      {actief === "Open" && voorstel ? (
+        // Op desktop staat het voorstel links; de Bezig-kaart komt in de rechterkolom
+        <div className="grid gap-3 lg:grid-cols-2 lg:gap-6">
+          <VoorstelKaart voorstel={voorstel} />
+        </div>
+      ) : (
+        <div className="mt-0.5 lg:mt-0">
+          <LeegKaart />
+        </div>
+      )}
     </div>
   );
 }
