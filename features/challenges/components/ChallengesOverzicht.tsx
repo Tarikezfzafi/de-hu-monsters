@@ -1,31 +1,71 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { accepteerChallenge, weigerChallenge } from "../actions";
 import type { ChallengeAfgerond, ChallengeBezig, ChallengeVoorstel } from "../types";
 import { AfgerondRijen } from "./AfgerondRijen";
 import { BezigKaarten } from "./BezigKaarten";
 import { LeegKaart } from "./LeegKaart";
-import { VoorstelKaart } from "./VoorstelKaart";
+import { Melding } from "./Melding";
+import { VoorstelKaarten } from "./VoorstelKaarten";
+
+const MELDING_DUUR_MS = 3000;
 
 const tabs = ["Open", "Bezig", "Afgerond"] as const;
 type Tab = (typeof tabs)[number];
 
 type ChallengesOverzichtProps = {
-  voorstel?: ChallengeVoorstel;
+  voorstellen?: ChallengeVoorstel[];
   bezig?: ChallengeBezig[];
   afgerond?: ChallengeAfgerond[];
+  // Voorbeeldpagina: de knoppen doen alsof, zonder de database
+  demo?: boolean;
 };
 
 // Tabs en inhoud van het challengescherm. Zonder challenges in de gekozen tab staat de lege staat.
 export function ChallengesOverzicht({
-  voorstel,
+  voorstellen = [],
   bezig = [],
   afgerond = [],
+  demo = false,
 }: ChallengesOverzichtProps) {
   const [actief, setActief] = useState<Tab>("Open");
+  const [melding, setMelding] = useState<{ tekst: string; id: number } | null>(null);
+  const [bezigMetActie, startActie] = useTransition();
+
+  // De melding verdwijnt na een paar seconden vanzelf
+  useEffect(() => {
+    if (!melding) return;
+
+    const timer = setTimeout(() => setMelding(null), MELDING_DUUR_MS);
+    return () => clearTimeout(timer);
+  }, [melding]);
+
+  function toonMelding(tekst: string) {
+    setMelding({ tekst, id: Date.now() });
+  }
+
+  // De server past de database aan en laadt de pagina daarna opnieuw met de nieuwe stand
+  function accepteer(id: string) {
+    if (demo) return toonMelding("Challenge geaccepteerd (voorbeeld)");
+
+    startActie(async () => {
+      const resultaat = await accepteerChallenge(id);
+      if (!resultaat.ok) toonMelding(resultaat.fout);
+    });
+  }
+
+  function weiger(id: string) {
+    if (demo) return toonMelding("Nieuwe challenge geladen");
+
+    startActie(async () => {
+      const resultaat = await weigerChallenge(id);
+      toonMelding(resultaat.ok ? (resultaat.melding ?? "Nieuwe challenge geladen") : resultaat.fout);
+    });
+  }
 
   // Open toont alle secties; Bezig en Afgerond alleen hun eigen sectie
-  const toonVoorstel = actief === "Open" ? voorstel : undefined;
+  const toonVoorstellen = actief === "Open" ? voorstellen : [];
   const toonBezig = actief === "Open" || actief === "Bezig" ? bezig : [];
   const toonAfgerond = actief === "Open" || actief === "Afgerond" ? afgerond : [];
 
@@ -49,9 +89,16 @@ export function ChallengesOverzicht({
         ))}
       </div>
 
-      {toonVoorstel || toonBezig.length > 0 || toonAfgerond.length > 0 ? (
+      {toonVoorstellen.length > 0 || toonBezig.length > 0 || toonAfgerond.length > 0 ? (
         <div className="grid items-start gap-x-6 gap-y-3 lg:grid-cols-2 lg:gap-y-7">
-          {toonVoorstel && <VoorstelKaart voorstel={toonVoorstel} />}
+          {toonVoorstellen.length > 0 && (
+            <VoorstelKaarten
+              voorstellen={toonVoorstellen}
+              bezig={bezigMetActie}
+              onAccepteren={accepteer}
+              onWeigeren={weiger}
+            />
+          )}
           {toonBezig.length > 0 && <BezigKaarten challenges={toonBezig} />}
           {toonAfgerond.length > 0 && (
             <div className="lg:col-span-2">
@@ -64,6 +111,8 @@ export function ChallengesOverzicht({
           <LeegKaart />
         </div>
       )}
+
+      <Melding tekst={melding?.tekst ?? null} />
     </div>
   );
 }
