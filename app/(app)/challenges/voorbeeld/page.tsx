@@ -45,7 +45,7 @@ export default function ChallengesVoorbeeldPage() {
     <main className="min-w-0 flex-1 px-5 pt-[41px] pb-10 lg:px-12 lg:pt-[83px]">
       <div className="mx-auto flex max-w-[1104px] flex-col gap-3 lg:gap-[34px]">
         <ChallengesKop punten={3} />
-        <ChallengesOverzicht voorstel={voorstel} bezig={bezig} afgerond={afgerond} />
+        <ChallengesOverzicht voorstellen={[voorstel]} bezig={bezig} afgerond={afgerond} demo />
       </div>
     </main>
   );
