@@ -86,7 +86,7 @@ export default function ProfielPage({ searchParams }: PageProps<"/profiel">) {
         <Suspense fallback={null}>
           <Melding searchParams={searchParams} />
         </Suspense>
-
+    
         <Suspense fallback={<p className="mt-4 text-sm text-hubi-muted">Laden...</p>}>
           <Profiel />
         </Suspense>
