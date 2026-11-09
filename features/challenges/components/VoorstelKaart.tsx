@@ -5,10 +5,11 @@ import { SectieKop } from "./SectieKop";
 
 type VoorstelKaartProps = {
   voorstel: ChallengeVoorstel;
+  onWeigeren?: () => void;
 };
 
 // Sectie VOORSTEL met de kaart van het voorgestelde challenge (Figma 08 / D8 Challenges)
-export function VoorstelKaart({ voorstel }: VoorstelKaartProps) {
+export function VoorstelKaart({ voorstel, onWeigeren }: VoorstelKaartProps) {
   const kopId = `voorstel-${voorstel.id}`;
 
   return (
@@ -35,7 +36,7 @@ export function VoorstelKaart({ voorstel }: VoorstelKaartProps) {
 
         <PartnerRegel partner={voorstel.partner} avatarUrl={voorstel.partnerAvatarUrl} />
 
-        <ChallengeKnoppen />
+        <ChallengeKnoppen onWeigeren={onWeigeren} />
       </article>
     </section>
   );

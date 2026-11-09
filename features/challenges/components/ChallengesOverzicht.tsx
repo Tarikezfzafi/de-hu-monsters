@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ChallengeAfgerond, ChallengeBezig, ChallengeVoorstel } from "../types";
 import { AfgerondRijen } from "./AfgerondRijen";
 import { BezigKaarten } from "./BezigKaarten";
 import { LeegKaart } from "./LeegKaart";
+import { Melding } from "./Melding";
 import { VoorstelKaart } from "./VoorstelKaart";
+
+const MELDING_DUUR_MS = 3000;
 
 const tabs = ["Open", "Bezig", "Afgerond"] as const;
 type Tab = (typeof tabs)[number];
@@ -23,6 +26,20 @@ export function ChallengesOverzicht({
   afgerond = [],
 }: ChallengesOverzichtProps) {
   const [actief, setActief] = useState<Tab>("Open");
+  const [melding, setMelding] = useState<{ tekst: string; id: number } | null>(null);
+
+  // De melding verdwijnt na een paar seconden vanzelf
+  useEffect(() => {
+    if (!melding) return;
+
+    const timer = setTimeout(() => setMelding(null), MELDING_DUUR_MS);
+    return () => clearTimeout(timer);
+  }, [melding]);
+
+  // Straks roept de backend dit aan nadat een nieuwe challenge is geladen
+  function toonMelding(tekst: string) {
+    setMelding({ tekst, id: Date.now() });
+  }
 
   // Open toont alle secties; Bezig en Afgerond alleen hun eigen sectie
   const toonVoorstel = actief === "Open" ? voorstel : undefined;
@@ -51,7 +68,12 @@ export function ChallengesOverzicht({
 
       {toonVoorstel || toonBezig.length > 0 || toonAfgerond.length > 0 ? (
         <div className="grid items-start gap-x-6 gap-y-3 lg:grid-cols-2 lg:gap-y-7">
-          {toonVoorstel && <VoorstelKaart voorstel={toonVoorstel} />}
+          {toonVoorstel && (
+            <VoorstelKaart
+              voorstel={toonVoorstel}
+              onWeigeren={() => toonMelding("Nieuwe challenge geladen")}
+            />
+          )}
           {toonBezig.length > 0 && <BezigKaarten challenges={toonBezig} />}
           {toonAfgerond.length > 0 && (
             <div className="lg:col-span-2">
@@ -64,6 +86,8 @@ export function ChallengesOverzicht({
           <LeegKaart />
         </div>
       )}
+
+      <Melding tekst={melding?.tekst ?? null} />
     </div>
   );
 }

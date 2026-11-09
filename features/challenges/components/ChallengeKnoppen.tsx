@@ -1,13 +1,18 @@
+"use client";
+
 import { STRAFPUNTEN_BIJ_WEIGEREN } from "../regels";
 
 type ChallengeKnoppenProps = {
   // Punten die het kost om een challenge te weigeren
   strafpunten?: number;
+  // Wordt aangeroepen na een klik op "Niet accepteren"
+  onWeigeren?: () => void;
 };
 
-// Knoppen in de Voorstel-kaart (Figma 08 / D8 Challenges). Nog zonder werking.
+// Knoppen in de Voorstel-kaart (Figma 08 / D8 Challenges). Nog zonder backend.
 export function ChallengeKnoppen({
   strafpunten = STRAFPUNTEN_BIJ_WEIGEREN,
+  onWeigeren,
 }: ChallengeKnoppenProps) {
   const weigerTekst = `Niet accepteren (−${strafpunten} ${
     strafpunten === 1 ? "punt" : "punten"
@@ -24,6 +29,7 @@ export function ChallengeKnoppen({
 
       <button
         type="button"
+        onClick={onWeigeren}
         className="min-h-11 w-full rounded-[10px] border-[1.5px] border-hubi-ink bg-white px-3 py-2 text-xs font-semibold text-hubi-ink transition-colors hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hubi-link lg:min-h-[54px] lg:w-auto lg:flex-1 lg:rounded-xl lg:text-sm"
       >
         {weigerTekst}
